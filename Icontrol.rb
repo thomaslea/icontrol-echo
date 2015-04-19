@@ -4,13 +4,16 @@ require 'rexml/document'
 $baseUrl = 'https://beta.icontrol.com'
 $loginUrl = "#{$baseUrl}/rest/icontrol/login"
 
+puts "Did i get anything"
 class Icontrol
   def initialize(username, password)
+    #puts "initialized. username = #{username}, password = #{password}"
     @username = username
     @password = password
   end
 
   def login
+    puts "logging into icontrol"
     @resource = RestClient::Resource.new( $loginUrl )
     response_login = @resource.get( :'X-AppKey' => "defaultKey", :'X-login' => @username, :'X-password' => @password )
     @sessionId = response_login.cookies["JSESSIONID"]
@@ -56,6 +59,16 @@ class Icontrol
   end
   
   def setDoorLock(name, lock)
+    #my door lock is named "Front Door" but alexa calls it "front door"
+    #can't just pull from map, so instead iterating on keys and on
+    # case insensitive match, i change the name to use to match key
+    @doorLocks.each do |key, value|
+      puts "Key: #{key}, Value: #{value}"
+      if (key.casecmp(name) == 0)
+        name = key
+      end
+    end
+    puts "putting #{@doorLocks[name]} to state: #{lock}"
     url = "#{$baseUrl}#{@doorLocks[name]}/points/isOn?value=#{lock}"
     resource = RestClient::Resource.new(url)
     response = resource.post(url, {:cookies => {"JSESSIONID" => @sessionId}})
