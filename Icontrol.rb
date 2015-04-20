@@ -4,10 +4,8 @@ require 'rexml/document'
 $baseUrl = 'https://beta.icontrol.com'
 $loginUrl = "#{$baseUrl}/rest/icontrol/login"
 
-puts "Did i get anything"
 class Icontrol
   def initialize(username, password)
-    #puts "initialized. username = #{username}, password = #{password}"
     @username = username
     @password = password
   end
